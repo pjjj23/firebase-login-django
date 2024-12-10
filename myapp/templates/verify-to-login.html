@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Code</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --dark-bg: #121212;
+            --card-bg: #1E1E1E;
+            --text-primary: #E0E0E0;
+            --accent-color: #00FF7F;
+            --shadow-color: rgba(0, 255, 127, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .verification-container {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 15px 30px var(--shadow-color);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verification-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                0deg, 
+                transparent, 
+                var(--accent-color), 
+                transparent
+            );
+            transform-origin: bottom center;
+            animation: rotate 4s linear infinite;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .verification-icon {
+            font-size: 4rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .verification-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .verification-description {
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .code-input-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .code-input-container .display-boxes {
+            display: flex;
+            gap: 1rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            justify-content: center;
+        }
+
+        .display-box {
+            width: 50px;
+            height: 60px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--text-primary);
+        }
+
+        .display-box.filled {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--shadow-color);
+        }
+
+        .code-input {
+            position: absolute;
+            width: 100%;
+            height: 60px;
+            text-align: center;
+            font-size: 2rem;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: transparent;
+            caret-color: transparent;
+            z-index: 2;
+            letter-spacing: 60px;
+            padding-left: 60px;
+        }
+
+        .verify-button {
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 3rem;
+        }
+
+        .verify-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px var(--shadow-color);
+        }
+
+        .verify-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255,255,255,0.3),
+                transparent
+            );
+            transition: all 0.6s;
+        }
+
+        .verify-button:hover::before {
+            left: 100%;
+        }
+
+        .resend-container {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .resend-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .resend-link:hover {
+            opacity: 0.8;
+        }
+
+        .countdown {
+            color: var(--text-primary);
+            opacity: 0.7;
+        }
+
+        @media (max-width: 500px) {
+            .verification-container {
+                padding: 2rem 1rem;
+            }
+
+            .display-box, .code-input {
+                width: 40px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            .code-input {
+                letter-spacing: 45px;
+                padding-left: 45px;
+            }
+        }
+
+        
+        /* Message Container Styles */
+        #message-container {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Modal Base Styles */
+        .message-modal {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            position: relative;
+        }
+
+        /* Message Type Specific Styles */
+        .message-modal.success {
+            background-color: #4CAF50;
+        }
+
+        .message-modal.error {
+            background-color: #F44336;
+        }
+
+        .message-modal.warning {
+            background-color: #FF9800;
+            color: black;
+        }
+
+        .message-modal.info {
+            background-color: #2196F3;
+        }
+
+        /* Animation Keyframes */
+        @keyframes slideFromTop {
+            from { 
+                transform: translateY(-100%); 
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0); 
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            to { 
+                transform: scale(0.9);
+                opacity: 0;
+            }
+        }
+
+        /* Animation Classes */
+        .message-modal.enter {
+            animation: slideFromTop 0.4s ease-out;
+        }
+
+        .message-modal.exit {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        {% if messages %}
+            <div id="message-container">
+                {% for message in messages %}
+                <div 
+                    data-message-type="{{ message.tags }}"
+                    class="message-modal {{ message.tags }} enter"
+                >
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="verification-container">
+        <div class="verification-icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h2 class="verification-title">Verification Code</h2>
+        <p class="verification-description">
+            Enter the 6-digit verification code sent to your email address.
+        </p>
+
+        <form method="POST" action="{% url 'OTPVerification' %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ user_id }}" />
+            
+            <div class="code-input-container">
+                <label for="otp" class="sr-only">Enter OTP</label>
+                <input 
+                    type="tel" 
+                    id="otp" 
+                    name="otp" 
+                    maxlength="6" 
+                    class="code-input" 
+                    pattern="\d{6}" 
+                    inputmode="numeric"  
+                    autocomplete="one-time-code" 
+                    required 
+                />
+                <div class="display-boxes">
+                    <div class="display-box"></div>
+                    <div class="display-box"></div>
+                    <div class="display-box"></div>
+                    <div class="display-box"></div>
+                    <div class="display-box"></div>
+                    <div class="display-box"></div>
+                </div>
+            </div>
+        
+            <button type="submit" class="verify-button">Verify Code</button>
+        
+            <div class="resend-container">
+                <span class="countdown">Resend in <span id="countdown-timer">59</span>s</span>
+                <a href="#" id="resend-link" class="resend-link" onclick="return false;">Resend Code</a>
+            </div>
+        </form>
+        
+        
+    </div>
+
+    <script>
+        const codeInput = document.querySelector('.code-input');
+        const displayBoxes = document.querySelectorAll('.display-box');
+        const verifyButton = document.querySelector('.verify-button');
+        const resendLink = document.querySelector('.resend-link');
+        const countdownSpan = document.querySelector('.countdown');
+
+        // Update display boxes as user types
+        codeInput.addEventListener('input', (e) => {
+            // Only allow numbers
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            
+            // Update display boxes
+            displayBoxes.forEach((box, index) => {
+                if (index < e.target.value.length) {
+                    box.classList.add('filled');
+                    box.textContent = e.target.value[index];
+                } else {
+                    box.classList.remove('filled');
+                    box.textContent = '';
+                }
+            });
+        });
+ 
+
+        // Countdown and resend logic
+        let timeLeft = 59;
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            countdownSpan.textContent = `Resend in ${timeLeft}s`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                countdownSpan.textContent = 'Code expired';
+                resendLink.style.display = 'inline';
+            }
+        }, 1000);
+
+        // Resend link
+        resendLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (timeLeft <= 0) {
+                // Reset countdown and resend logic
+                timeLeft = 59;
+                countdownSpan.textContent = 'Resend in 59s';
+                resendLink.style.display = 'none';
+                
+                // Reset input and display boxes
+                codeInput.value = '';
+                displayBoxes.forEach(box => {
+                    box.classList.remove('filled');
+                    box.textContent = '';
+                });
+                
+                // Restart countdown
+                const newCountdownInterval = setInterval(() => {
+                    timeLeft--;
+                    countdownSpan.textContent = `Resend in ${timeLeft}s`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(newCountdownInterval);
+                        countdownSpan.textContent = 'Code expired';
+                        resendLink.style.display = 'inline';
+                    }
+                }, 1000);
+
+                // Optional: Trigger code resend logic
+                alert('Resending verification code...');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageModals = document.querySelectorAll('.message-modal');
+            
+            messageModals.forEach(modal => {
+                let startY = 0;
+                let isDragging = false;
+
+                // Auto-dismiss after 5 seconds
+                const autoCloseTimer = setTimeout(() => {
+                    closeModal(modal);
+                }, 5000);
+
+                // Touch start for mobile
+                modal.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                    isDragging = false;
+                });
+
+                // Touch move for tracking swipe
+                modal.addEventListener('touchmove', (e) => {
+                    const currentY = e.touches[0].clientY;
+                    if (Math.abs(currentY - startY) > 50) {
+                        isDragging = true;
+                    }
+                });
+
+                // Touch end to close or reset
+                modal.addEventListener('touchend', () => {
+                    if (isDragging) {
+                        closeModal(modal);
+                    }
+                });
+
+                // Click to dismiss
+                modal.addEventListener('click', () => {
+                    clearTimeout(autoCloseTimer);
+                    closeModal(modal);
+                });
+
+                function closeModal(modalElement) {
+                    modalElement.classList.remove('enter');
+                    modalElement.classList.add('exit');
+                    modalElement.addEventListener('animationend', () => {
+                        modalElement.remove();
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

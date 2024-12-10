@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataLink Pipeline Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3B82F6;
+            --secondary-color: #60A5FA;
+            --background-color: #2b2b2b;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --card-background: #FFFFFF;
+            --hover-color: #2563EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .login-container {
+            display: flex;
+            width: 1100px;
+            height: 700px;
+            background-color: var(--card-background);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .login-left {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .login-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            background-color: var(--card-background);
+        }
+
+        .logo {
+            position: absolute;
+            top: 15px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .welcome-text {
+            margin-bottom: 40px;
+        }
+
+        .welcome-text h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .welcome-text p {
+            font-size: 16px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .login-form {
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .login-form input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .login-form input:focus + i {
+            color: var(--primary-color);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .checkbox-wrapper .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .checkbox-wrapper .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+        }
+
+        .login-btn i {
+            margin-right: 10px;
+        }
+
+        .illustration {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: rotateY(-15deg);
+            transition: transform 0.5s ease;
+        }
+
+        .illustration:hover {
+            transform: rotateY(0);
+        }
+
+        .illustration img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+            filter: drop-shadow(0 25px 25px rgba(0,0,0,0.2));
+        }
+
+        .error-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .error-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            transform: scale(0.7);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .error-content.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .error-content i {
+            color: #EF4444;
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .error-content h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+
+        .error-content button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @media (max-width: 1200px) {
+            .login-container {
+                width: 90%;
+                height: auto;
+                flex-direction: column;
+            }
+
+            .login-left, .login-right {
+                flex: none;
+                width: 100%;
+                padding: 40px;
+            }
+
+            .illustration {
+                display: none;
+            }
+            .welcome-text{
+                margin-top: 25px;
+            }
+        }
+
+        
+        /* Message Container Styles */
+        #message-container {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Modal Base Styles */
+        .message-modal {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            position: relative;
+        }
+
+        /* Message Type Specific Styles */
+        .message-modal.success {
+            background-color: #4CAF50;
+        }
+
+        .message-modal.error {
+            background-color: #F44336;
+        }
+
+        .message-modal.warning {
+            background-color: #FF9800;
+            color: black;
+        }
+
+        .message-modal.info {
+            background-color: #2196F3;
+        }
+
+        /* Animation Keyframes */
+        @keyframes slideFromTop {
+            from { 
+                transform: translateY(-100%); 
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0); 
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            to { 
+                transform: scale(0.9);
+                opacity: 0;
+            }
+        }
+
+        /* Animation Classes */
+        .message-modal.enter {
+            animation: slideFromTop 0.4s ease-out;
+        }
+
+        .message-modal.exit {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        {% if messages %}
+            <div id="message-container">
+                {% for message in messages %}
+                <div 
+                    data-message-type="{{ message.tags }}"
+                    class="message-modal {{ message.tags }} enter"
+                >
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="login-container">
+        <div class="login-left">
+            <div class="logo">
+                <img src="https://www.pngkey.com/png/full/54-547425_logo-one-piece-png-best-logos-of-one.png" alt="DataLink Logo">
+                <div class="logo-text">DataLink</div>
+            </div>
+            <div class="welcome-text">
+                <h1>Welcome Back</h1>
+                <p>Sign in to continue to the DataLink Pipeline</p>
+            </div>
+            <div class="illustration">
+                <img src="https://firebasestorage.googleapis.com/v0/b/ctuacaccreditedboardinghouse.appspot.com/o/default_profileimg%2FCTU-logo-BH.png?alt=media&token=23bd87f5-9483-4c77-910b-a3d3838e07d9" alt="Illustration" style="animation: float 4s ease-in-out infinite;">
+            </div>
+        </div>
+        <div class="login-right">
+            <form id="loginForm" class="login-form" method="POST" action="{% url 'home' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+                <div class="checkbox-wrapper">
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    <a href="{% url 'signup' %}" class="forgot-password">Create Account</a>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>            
+        </div>
+    </div>
+
+    <div class="error-modal" id="errorModal">
+        <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Incorrect Credentials</h3>
+            <p>Please check your email and password and try again.</p>
+            <button id="closeModal">Close</button>
+        </div>
+    </div>
+
+    <script> 
+ 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageModals = document.querySelectorAll('.message-modal');
+            
+            messageModals.forEach(modal => {
+                let startY = 0;
+                let isDragging = false;
+
+                // Auto-dismiss after 5 seconds
+                const autoCloseTimer = setTimeout(() => {
+                    closeModal(modal);
+                }, 5000);
+
+                // Touch start for mobile
+                modal.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                    isDragging = false;
+                });
+
+                // Touch move for tracking swipe
+                modal.addEventListener('touchmove', (e) => {
+                    const currentY = e.touches[0].clientY;
+                    if (Math.abs(currentY - startY) > 50) {
+                        isDragging = true;
+                    }
+                });
+
+                // Touch end to close or reset
+                modal.addEventListener('touchend', () => {
+                    if (isDragging) {
+                        closeModal(modal);
+                    }
+                });
+
+                // Click to dismiss
+                modal.addEventListener('click', () => {
+                    clearTimeout(autoCloseTimer);
+                    closeModal(modal);
+                });
+
+                function closeModal(modalElement) {
+                    modalElement.classList.remove('enter');
+                    modalElement.classList.add('exit');
+                    modalElement.addEventListener('animationend', () => {
+                        modalElement.remove();
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
